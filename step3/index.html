@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>Signs</title>
+    <style>
+	.input-container {
+	    display: grid;
+	    grid-template-rows: 200px 50px;
+	    grid-template-columns: 300px 300px;
+	    grid-template-areas:
+		"inputArea previewArea"
+		"buttonArea buttonArea";
+	    grid-gap 10px;
+	}
+	.inputArea {
+	    grid-area: inputArea;
+	    display: grid;
+	}
+	.previewArea {
+	    grid-area: previewArea;
+	    display: grid;
+	}
+	.buttonArea {
+	    grid-area: buttonArea;
+	    display: grid;
+	    justify-items: center;
+	    align-items: center;
+	}
+	.filterArea {
+	    display: grid;
+	    grid-template-columns: 300px 300px;
+	    grid-gap: 10px;
+	}
+	table {
+	    margin-top: 10px;
+	    width: 610px;
+	    border-collapse: collapse;
+	}
+	th, td {
+	    width: 50%;
+	    padding-left: 5px;
+	    word-break: break-all;
+	}
+    </style>
+</head>
+<body>
+    <div id="app">
+	<div class="input-container">
+	    <form class="inputArea">
+		<p>User</p>
+		<label>NickName</label>
+		<input v-model="nickname">
+		<label>Email</label>
+		<input v-model="email">
+	    </form>
+	    <div class="previewArea">
+		<p>Preview</p>
+		<label for="">NickName</label>
+		<input type="" v-bind:value="nickname" readonly>
+		<label for="">Email</label>
+		<input type="" v-bind:value="email" readonly>
+	    </div>
+	    <div class="buttonArea">
+		<button v-on:click="saveUser">Register</button>
+	    </div>
+	</div>
+	<div>
+	    <div class="filterArea">
+		<label for="">Find by NickName</label>
+		<input type="" v-model="nicknameFilter">
+	    </div>
+	    <table>
+		<thead>
+		    <th>NickName</th>
+		    <th>Email</th>
+		</thead>
+		<tbody>
+		    <tr v-for="user in filteredUsers">
+		        <td>{{ user.nickname }}</td>
+		        <td>{{ user.email }}</td>
+		    </tr>
+		</tbody>
+	    </table>
+	</div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/vue@3.0.0/dist/vue.global.js"></script>
+    <script>
+	const app = Vue.createApp({
+	    data: () => ({
+		users: [],
+		nickname: "",
+		email: "",
+		nicknameFilter: "",
+	    }),
+	    methods: {
+		saveUser: function() {
+		    let user = {
+			nickname: this.nickname,
+			email: this.email,
+		    };
+		    this.users.push(user);
+		    alert('Register with [NickName: ' + this.nickname + ' Email: ' + this.email + ']');
+		},
+	    },
+	    computed: {
+		filteredUsers: function() {
+		    return this.users.filter(user => user.nickname.includes(this.nicknameFilter));
+		},
+	    },
+	});
+	app.mount('#app');
+    </script>
+</body>
+</html>
