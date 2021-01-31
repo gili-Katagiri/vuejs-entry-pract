@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="utf-8">
+<title>Input Data</title> 
+<style>
+    .input-container {
+        display: grid;
+        grid-template-rows: 200px 50px;
+        grid-template-columns: 300px 300px;
+        grid-template-areas: 
+	    "inputArea previewArea"
+	    "buttonArea buttonArea";
+        grid-gap 10px;
+    }
+    .inputArea {
+        grid-area: inputArea;
+        display: grid;
+    }
+    .previewArea {
+        grid-area: previewArea;
+        display: grid;
+    }
+    .buttonArea {
+	grid-area: buttonArea;
+	display: grid;
+	justify-items: center;
+	align-items: center;
+    }
+</style>
+<div id="app">
+    <div class="input-container">
+        <form class="inputArea">
+            <p>User</p>
+            <label>NickName</label>
+            <input v-model="nickname">
+            <label>MailAddress</label>
+            <input v-model="email">
+        </form>
+	<div class="previewArea">
+	    <p>Preview</p>
+	    <label>NickName</label>
+	    <input v-bind:value="nickname" readonly>
+	    <label>MailAddress</label>
+	    <input v-bind:value="email" readonly>
+	</div>
+    </div>
+    <div class="buttonArea">
+	<button v-on:click="saveUser">Register</button>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/vue@3.0.0/dist/vue.global.js"></script> 
+<script>
+    const app = Vue.createApp({
+        data: () => ({
+	    users: [],
+            nickname: '',
+            email: '',
+         }),
+	 methods: {
+	    saveUser: function() {
+		let user = {
+		    nickname: this.nickname,
+		    email: this.email,
+		};
+		this.users.push(user);
+		alert('Register[ NickName: ' + this.nickname + ' Email: ' + this.email + ']');
+	    },
+	 }
+    });
+    app.mount('#app');
+</script>
