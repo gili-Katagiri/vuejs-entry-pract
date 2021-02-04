@@ -94,7 +94,8 @@ td {
 }
 </style>
 
-<script>
+<script lang="ts">
+// TypeScript with CompositionAPI
 import {
   defineComponent,
   reactive,
@@ -109,11 +110,12 @@ export default defineComponent({
   },
   setup() {
     const state = reactive({
-      users: [],
+      users: [] as User[],
       nickname: "",
       email: "",
       nicknameFilter: "",
-      filterdUsers: computed(() => {
+
+      filterdUsers: computed((): User[] => {
         return state.users.filter(user =>
           user.nickname.includes(state.nicknameFilter)
         );
@@ -121,22 +123,23 @@ export default defineComponent({
     });
 
     const saveUser = () => {
-      const user = new User(state.nickname, state.email);
+      const user: User = {
+        nickname: state.nickname,
+        email: state.email
+      };
       state.users.push(user);
-
       alert(
-        "REGISTER--- NickName: " +
-          state.nickname +
-          " EMail: " +
-          state.email +
-          " ---"
+        "---REGISTER---\n" +
+          `  Nickname: ${state.nickname}\n` +
+          `  Email: ${state.email}\n` +
+          "--------------"
       );
     };
 
     const displayUsers = () => {
-      let message = "Registerd " + state.users.length + " persons.";
+      let message = `Registerd ${state.users.length} persons.`;
       for (const user of state.users) {
-        message += "\n" + user.nickname;
+        message += "\n  " + user.nickname;
       }
       alert(message);
     };
@@ -148,4 +151,101 @@ export default defineComponent({
     };
   }
 });
+// TypeScript
+//import { Component, Vue } from "vue-property-decorator";
+//import userRowComponent, { User } from "@/componets/UserRow.vue";
+//
+//@Component({
+//  components: {
+//    "user-row": userRowComponent
+//  }
+//})
+//export default class EditComponent extends Vue {
+//  private users: User[] = [];
+//  private nickname = "";
+//  private email = "";
+//  private nicknameFilter = "";
+//
+//  private get filterdUsers() {
+//    return this.users.filter(user =>
+//      user.nickname.includes(this.nicknameFilter)
+//    );
+//  }
+//
+//  private saveUser() {
+//    const user: User = {
+//      nickname: this.nickname,
+//      email: this.email
+//    };
+//    this.users.push(user);
+//    alert(
+//      "---REGISTER---\n" +
+//        `  Nickname: ${this.nickname}\n` +
+//        `  Email: ${this.email}\n` +
+//        "--------------"
+//    );
+//  }
+//
+//  private displayUsers() {
+//    let message = `Registerd ${this.users.length} persons.`;
+//    for (const user of this.users) {
+//      message += "\n  " + user.nickname;
+//    }
+//    alert(message);
+//  }
+//}
+// JavaScript with CompositionAPI
+//import {
+//  defineComponent,
+//  reactive,
+//  toRefs,
+//  computed
+//} from "@vue/composition-api";
+//import userRowComponent, { User } from "@/components/UserRow.vue";
+//
+//export default defineComponent({
+//  components: {
+//    "user-row": userRowComponent
+//  },
+//  setup() {
+//    const state = reactive({
+//      users: [],
+//      nickname: "",
+//      email: "",
+//      nicknameFilter: "",
+//      filterdUsers: computed(() => {
+//        return state.users.filter(user =>
+//          user.nickname.includes(state.nicknameFilter)
+//        );
+//      })
+//    });
+//
+//    const saveUser = () => {
+//      const user = new User(state.nickname, state.email);
+//      state.users.push(user);
+//
+//      alert(
+//        "REGISTER--- NickName: " +
+//          state.nickname +
+//          " EMail: " +
+//          state.email +
+//          " ---"
+//      );
+//    };
+//
+//    const displayUsers = () => {
+//      let message = "Registerd " + state.users.length + " persons.";
+//      for (const user of state.users) {
+//        message += "\n" + user.nickname;
+//      }
+//      alert(message);
+//    };
+//
+//    return {
+//      ...toRefs(state),
+//      saveUser,
+//      displayUsers
+//    };
+//  }
+//});
 </script>
