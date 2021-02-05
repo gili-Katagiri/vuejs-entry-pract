@@ -1,6 +1,6 @@
 {
 	// ref: Vue.js Hands on P151
-	"tsserver.enable": true,
+	"tsserver.enable": false,
 	"tsserver.tsdk": "./node_modules/typescript/lib",
 	"eslint.format.enable": true,
 	"eslint.autoFixOnSave": true,
