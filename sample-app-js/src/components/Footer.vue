@@ -58,8 +58,13 @@
 </style>
 
 <script>
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
-import { profileMockData } from '@/store/profiles';
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  computed,
+} from '@vue/composition-api';
+import { profileStore } from '@/store/profiles';
 
 export default defineComponent({
   setup(prop, context) {
@@ -72,7 +77,9 @@ export default defineComponent({
         },
         { title: 'Share', icon: 'share', method: 'share' },
       ],
-      signInUser: profileMockData,
+      signInUser: computed(() => {
+        return profileStore.profile;
+      }),
     });
 
     const handleMethod = methodName => {
@@ -93,6 +100,7 @@ export default defineComponent({
       routerPush('/share');
     };
     const signOut = () => {
+      profileStore.profile = null;
       routerPush('/sign-in');
     };
 
