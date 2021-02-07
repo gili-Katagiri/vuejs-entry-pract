@@ -53,3 +53,9 @@ export const update = profile => {
   targetUser.themeColor = profile.themeColor;
   targetUser.hasAvatar = profile.hasAvatar;
 };
+
+export const searchUsers = partOfNickname => {
+  return sharedUserStore.sharedUsers.filter(user =>
+    user.nickname.includes(partOfNickname),
+  );
+};
