@@ -68,33 +68,49 @@
         v-model="profile.nickname"
         class="mt-4"
         readonly
-        label="NickName*"
+        label="Nickname*"
         append-outer-icon="edit"
-        @click:append-outer.stop="editNickName"
+        @click:append-outer.stop="editNickname"
       ></v-text-field>
       <v-dialog
-        v-model="isOpenEditNickNameDialog"
+        v-model="isOpenEditNicknameDialog"
         max-width="600"
         open-on-hover
       >
         <v-card>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-text-field
-                  v-model="newNickName"
-                  label="NickName*"
-                ></v-text-field>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeEditNickNameDialog"
-              >Cancel</v-btn
+          <ValidationObserver v-slot="{ invalid }">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Nickname"
+              :rules="validationRules.nickname"
             >
-            <v-btn color="blue darken-1" text @click="saveNickName">Save</v-btn>
-          </v-card-actions>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-text-field
+                      v-model="newNickname"
+                      label="Nickname*"
+                      :error-count="Number.MAX_VALUE"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+            </ValidationProvider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditNicknameDialog"
+                >Cancel</v-btn
+              >
+              <v-btn
+                color="blue darken-1"
+                text
+                :disabled="invalid"
+                @click="saveNickname"
+                >Save</v-btn
+              >
+            </v-card-actions>
+          </ValidationObserver>
         </v-card>
       </v-dialog>
       <v-text-field
@@ -108,7 +124,12 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  computed,
+} from '@vue/composition-api';
 import {
   profileStore,
   updateUserName,
@@ -121,10 +142,18 @@ export default defineComponent({
     const state = reactive({
       profile: profileStore.profile,
       newUserName: null,
-      newNickName: null,
+      newNickname: null,
       newThemeColor: profileStore.profile.themeColor,
       isOpenEditUserNameDialog: false,
-      isOpenEditNickNameDialog: false,
+      isOpenEditNicknameDialog: false,
+      validationRules: computed(() => {
+        return {
+          nickname: {
+            required: true,
+            max: 15,
+          },
+        };
+      }),
     });
 
     const saveThemeColor = () => {
@@ -138,11 +167,11 @@ export default defineComponent({
       state.isOpenEditUserNameDialog = false;
     };
 
-    const saveNickName = () => {
-      if (state.newNickName) {
-        updateNickname(state.newNickName);
+    const saveNickname = () => {
+      if (state.newNickname) {
+        updateNickname(state.newNickname);
       }
-      state.isOpenEditNickNameDialog = false;
+      state.isOpenEditNicknameDialog = false;
     };
 
     const editUserName = () => {
@@ -150,17 +179,17 @@ export default defineComponent({
       state.isOpenEditUserNameDialog = true;
     };
 
-    const editNickName = () => {
-      state.newNickName = state.profile.nickname;
-      state.isOpenEditNickNameDialog = true;
+    const editNickname = () => {
+      state.newNickname = state.profile.nickname;
+      state.isOpenEditNicknameDialog = true;
     };
 
     const closeEditUserNameDialog = () => {
       state.isOpenEditUserNameDialog = false;
     };
 
-    const closeEditNickNameDialog = () => {
-      state.isOpenEditNickNameDialog = false;
+    const closeEditNicknameDialog = () => {
+      state.isOpenEditNicknameDialog = false;
     };
 
     const saveFileContent = () => {
@@ -171,11 +200,11 @@ export default defineComponent({
       ...toRefs(state),
       saveThemeColor,
       saveUserName,
-      saveNickName,
+      saveNickname,
       editUserName,
-      editNickName,
+      editNickname,
       closeEditUserNameDialog,
-      closeEditNickNameDialog,
+      closeEditNicknameDialog,
       saveFileContent,
     };
   },
