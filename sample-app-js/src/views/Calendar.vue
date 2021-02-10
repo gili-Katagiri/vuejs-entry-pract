@@ -296,6 +296,7 @@ import {
   toRefs,
   computed,
   nextTick,
+  onUpdated,
 } from '@vue/composition-api';
 import {
   parseDate,
@@ -367,6 +368,14 @@ export default defineComponent({
       disabledEndTime: computed(() => {
         return !state.endDate || !state.startTime;
       }),
+    });
+    onUpdated(() => {
+      if (props.type === 'month') {
+        return;
+      }
+      nextTick(() => {
+        state.calendar.scrollToTime('07:00');
+      });
     });
     const methods = {
       setToday: () => {
