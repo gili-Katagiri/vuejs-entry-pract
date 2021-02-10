@@ -45,23 +45,39 @@
         open-on-hover
       >
         <v-card>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-text-field
-                  v-model="newUserName"
-                  label="UserName*"
-                ></v-text-field>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeEditUserNameDialog"
-              >Cancel</v-btn
+          <ValidationObserver v-slot="{ invalid }">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="UserName"
+              :rules="validationRules.userName"
             >
-            <v-btn color="blue darken-1" text @click="saveUserName">Save</v-btn>
-          </v-card-actions>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-text-field
+                      v-model="newUserName"
+                      label="UserName*"
+                      :error-conut="Number.MAX_VALUE"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+            </ValidationProvider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditUserNameDialog"
+                >Cancel</v-btn
+              >
+              <v-btn
+                color="blue darken-1"
+                text
+                :disabled="invalid"
+                @click="saveUserName"
+                >Save</v-btn
+              >
+            </v-card-actions>
+          </ValidationObserver>
         </v-card>
       </v-dialog>
       <v-text-field
@@ -148,6 +164,11 @@ export default defineComponent({
       isOpenEditNicknameDialog: false,
       validationRules: computed(() => {
         return {
+          userName: {
+            required: true,
+            userNameAllowedCharacters: true,
+            max: 15,
+          },
           nickname: {
             required: true,
             max: 15,

@@ -17,6 +17,12 @@ configure(config);
 
 extend('required', required);
 extend('max', max);
+extend('userNameAllowedCharacters', {
+  message: 'Only [A-Z, a-z, 0-9, _] are available in {_field_}',
+  validate: value => {
+    return /^[0-9A-Z_]*$/i.test(value);
+  },
+});
 
 localize('ja', ja);
 
