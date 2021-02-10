@@ -11,7 +11,7 @@ import { required, max, ext, size } from 'vee-validate/dist/rules';
 
 const config = {
   bails: false,
-  mode: 'aggressive',
+  mode: 'eager',
 };
 configure(config);
 

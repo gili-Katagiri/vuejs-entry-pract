@@ -47,7 +47,7 @@
         open-on-hover
       >
         <v-card>
-          <ValidationObserver v-slot="{ invalid }">
+          <ValidationObserver ref="userNameValidationObserver">
             <ValidationProvider
               v-slot="{ errors }"
               name="UserName"
@@ -74,7 +74,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                :disabled="invalid"
+                :disabled="userNameSaveDisabled"
                 @click="saveUserName"
                 >Save</v-btn
               >
@@ -96,7 +96,7 @@
         open-on-hover
       >
         <v-card>
-          <ValidationObserver v-slot="{ invalid }">
+          <ValidationObserver ref="nicknameValidationObserver">
             <ValidationProvider
               v-slot="{ errors }"
               name="Nickname"
@@ -123,7 +123,7 @@
               <v-btn
                 color="blue darken-1"
                 text
-                :disabled="invalid"
+                :disabled="nicknameSaveDisabled"
                 @click="saveNickname"
                 >Save</v-btn
               >
@@ -147,6 +147,8 @@ import {
   reactive,
   toRefs,
   computed,
+  watch,
+  nextTick,
 } from '@vue/composition-api';
 import {
   profileStore,
@@ -164,7 +166,12 @@ export default defineComponent({
       newNickname: null,
       newThemeColor: profileStore.profile.themeColor,
       isOpenEditUserNameDialog: false,
+      userNameSaveDisabled: false,
       isOpenEditNicknameDialog: false,
+      nicknameSaveDisabled: false,
+      userNameValidationObserver: null,
+      nicknameValidationObserver: null,
+      avatarErrors: null,
       validationRules: computed(() => {
         return {
           userName: {
@@ -182,9 +189,31 @@ export default defineComponent({
           },
         };
       }),
-      avatarErrors: null,
     });
-
+    watch(
+      () => state.newUserName,
+      () => {
+        nextTick(() => {
+          state.userNameValidationObserver
+            .validate({ silent: true })
+            .then(result => {
+              state.userNameSaveDisabled = !result;
+            });
+        });
+      },
+    );
+    watch(
+      () => state.newNickname,
+      () => {
+        nextTick(() => {
+          state.nicknameValidationObserver
+            .validate({ silent: true })
+            .then(result => {
+              state.nicknameSaveDisabled = !result;
+            });
+        });
+      },
+    );
     const saveThemeColor = () => {
       updateThemeColor(state.newThemeColor);
     };
