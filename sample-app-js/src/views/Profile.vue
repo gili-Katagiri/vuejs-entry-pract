@@ -15,6 +15,8 @@
             accept="image/png, image/jpeg, image/bmp"
             prepend-icon="photo_camera"
             label="Avatar"
+            :error-count="Number.MAX_VALUE"
+            :error-messages="avatarErrors"
             @change="saveFileContent"
           ></v-file-input>
         </v-col>
@@ -152,6 +154,7 @@ import {
   updateNickname,
   updateThemeColor,
 } from '@/store/profiles';
+import { validate } from 'vee-validate';
 
 export default defineComponent({
   setup: () => {
@@ -173,8 +176,13 @@ export default defineComponent({
             required: true,
             max: 15,
           },
+          avatar: {
+            ext: ['png', 'jpeg', 'bmp'],
+            size: 300,
+          },
         };
       }),
+      avatarErrors: null,
     });
 
     const saveThemeColor = () => {
@@ -213,8 +221,19 @@ export default defineComponent({
       state.isOpenEditNicknameDialog = false;
     };
 
-    const saveFileContent = () => {
-      console.log('SaveFileContent');
+    const saveFileContent = file => {
+      state.avatarErrors = null;
+      if (!file) {
+        return;
+      }
+      validate(file, state.validationRules.avatar, {
+        name: 'Avatar',
+      }).then(result => {
+        if (!result.valid) {
+          state.avatarErrors = result.errors;
+          return;
+        }
+      });
     };
 
     return {

@@ -7,7 +7,7 @@ import {
   ValidationProvider,
 } from 'vee-validate';
 import ja from 'vee-validate/dist/locale/ja';
-import { required, max } from 'vee-validate/dist/rules';
+import { required, max, ext, size } from 'vee-validate/dist/rules';
 
 const config = {
   bails: false,
@@ -17,6 +17,8 @@ configure(config);
 
 extend('required', required);
 extend('max', max);
+extend('ext', ext);
+extend('size', size);
 extend('userNameAllowedCharacters', {
   message: 'Only [A-Z, a-z, 0-9, _] are available in {_field_}',
   validate: value => {
