@@ -15,6 +15,8 @@
             accept="image/png, image/jpeg, image/bmp"
             prepend-icon="photo_camera"
             label="Avatar"
+            :error-count="Number.MAX_VALUE"
+            :error-messages="avatarErrors"
             @change="saveFileContent"
           ></v-file-input>
         </v-col>
@@ -45,56 +47,88 @@
         open-on-hover
       >
         <v-card>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-text-field
-                  v-model="newUserName"
-                  label="UserName*"
-                ></v-text-field>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeEditUserNameDialog"
-              >Cancel</v-btn
+          <ValidationObserver ref="userNameValidationObserver">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="UserName"
+              :rules="validationRules.userName"
             >
-            <v-btn color="blue darken-1" text @click="saveUserName">Save</v-btn>
-          </v-card-actions>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-text-field
+                      v-model="newUserName"
+                      label="UserName*"
+                      :error-conut="Number.MAX_VALUE"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+            </ValidationProvider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditUserNameDialog"
+                >Cancel</v-btn
+              >
+              <v-btn
+                color="blue darken-1"
+                text
+                :disabled="userNameSaveDisabled"
+                @click="saveUserName"
+                >Save</v-btn
+              >
+            </v-card-actions>
+          </ValidationObserver>
         </v-card>
       </v-dialog>
       <v-text-field
         v-model="profile.nickname"
         class="mt-4"
         readonly
-        label="NickName*"
+        label="Nickname*"
         append-outer-icon="edit"
-        @click:append-outer.stop="editNickName"
+        @click:append-outer.stop="editNickname"
       ></v-text-field>
       <v-dialog
-        v-model="isOpenEditNickNameDialog"
+        v-model="isOpenEditNicknameDialog"
         max-width="600"
         open-on-hover
       >
         <v-card>
-          <v-card-text>
-            <v-container>
-              <v-row>
-                <v-text-field
-                  v-model="newNickName"
-                  label="NickName*"
-                ></v-text-field>
-              </v-row>
-            </v-container>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" text @click="closeEditNickNameDialog"
-              >Cancel</v-btn
+          <ValidationObserver ref="nicknameValidationObserver">
+            <ValidationProvider
+              v-slot="{ errors }"
+              name="Nickname"
+              :rules="validationRules.nickname"
             >
-            <v-btn color="blue darken-1" text @click="saveNickName">Save</v-btn>
-          </v-card-actions>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-text-field
+                      v-model="newNickname"
+                      label="Nickname*"
+                      :error-count="Number.MAX_VALUE"
+                      :error-messages="errors"
+                    ></v-text-field>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+            </ValidationProvider>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn color="blue darken-1" text @click="closeEditNicknameDialog"
+                >Cancel</v-btn
+              >
+              <v-btn
+                color="blue darken-1"
+                text
+                :disabled="nicknameSaveDisabled"
+                @click="saveNickname"
+                >Save</v-btn
+              >
+            </v-card-actions>
+          </ValidationObserver>
         </v-card>
       </v-dialog>
       <v-text-field
@@ -108,25 +142,78 @@
 </template>
 
 <script>
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import {
+  defineComponent,
+  reactive,
+  toRefs,
+  computed,
+  watch,
+  nextTick,
+} from '@vue/composition-api';
 import {
   profileStore,
   updateUserName,
   updateNickname,
   updateThemeColor,
 } from '@/store/profiles';
+import { validate } from 'vee-validate';
 
 export default defineComponent({
   setup: () => {
     const state = reactive({
       profile: profileStore.profile,
       newUserName: null,
-      newNickName: null,
+      newNickname: null,
       newThemeColor: profileStore.profile.themeColor,
       isOpenEditUserNameDialog: false,
-      isOpenEditNickNameDialog: false,
+      userNameSaveDisabled: false,
+      isOpenEditNicknameDialog: false,
+      nicknameSaveDisabled: false,
+      userNameValidationObserver: null,
+      nicknameValidationObserver: null,
+      avatarErrors: null,
+      validationRules: computed(() => {
+        return {
+          userName: {
+            required: true,
+            userNameAllowedCharacters: true,
+            max: 15,
+          },
+          nickname: {
+            required: true,
+            max: 15,
+          },
+          avatar: {
+            ext: ['png', 'jpeg', 'bmp'],
+            size: 300,
+          },
+        };
+      }),
     });
-
+    watch(
+      () => state.newUserName,
+      () => {
+        nextTick(() => {
+          state.userNameValidationObserver
+            .validate({ silent: true })
+            .then(result => {
+              state.userNameSaveDisabled = !result;
+            });
+        });
+      },
+    );
+    watch(
+      () => state.newNickname,
+      () => {
+        nextTick(() => {
+          state.nicknameValidationObserver
+            .validate({ silent: true })
+            .then(result => {
+              state.nicknameSaveDisabled = !result;
+            });
+        });
+      },
+    );
     const saveThemeColor = () => {
       updateThemeColor(state.newThemeColor);
     };
@@ -138,11 +225,11 @@ export default defineComponent({
       state.isOpenEditUserNameDialog = false;
     };
 
-    const saveNickName = () => {
-      if (state.newNickName) {
-        updateNickname(state.newNickName);
+    const saveNickname = () => {
+      if (state.newNickname) {
+        updateNickname(state.newNickname);
       }
-      state.isOpenEditNickNameDialog = false;
+      state.isOpenEditNicknameDialog = false;
     };
 
     const editUserName = () => {
@@ -150,32 +237,43 @@ export default defineComponent({
       state.isOpenEditUserNameDialog = true;
     };
 
-    const editNickName = () => {
-      state.newNickName = state.profile.nickname;
-      state.isOpenEditNickNameDialog = true;
+    const editNickname = () => {
+      state.newNickname = state.profile.nickname;
+      state.isOpenEditNicknameDialog = true;
     };
 
     const closeEditUserNameDialog = () => {
       state.isOpenEditUserNameDialog = false;
     };
 
-    const closeEditNickNameDialog = () => {
-      state.isOpenEditNickNameDialog = false;
+    const closeEditNicknameDialog = () => {
+      state.isOpenEditNicknameDialog = false;
     };
 
-    const saveFileContent = () => {
-      console.log('SaveFileContent');
+    const saveFileContent = file => {
+      state.avatarErrors = null;
+      if (!file) {
+        return;
+      }
+      validate(file, state.validationRules.avatar, {
+        name: 'Avatar',
+      }).then(result => {
+        if (!result.valid) {
+          state.avatarErrors = result.errors;
+          return;
+        }
+      });
     };
 
     return {
       ...toRefs(state),
       saveThemeColor,
       saveUserName,
-      saveNickName,
+      saveNickname,
       editUserName,
-      editNickName,
+      editNickname,
       closeEditUserNameDialog,
-      closeEditNickNameDialog,
+      closeEditNicknameDialog,
       saveFileContent,
     };
   },
