@@ -13,6 +13,7 @@ module.exports = {
       });
     },
   },
+  transpileDependencies: ['vuetify'],
   configureWebpack: {
     plugins: [
       new StyleLintPlugin({
@@ -20,6 +21,4 @@ module.exports = {
       }),
     ],
   },
-
-  transpileDependencies: ['vuetify'],
 };

@@ -1,3 +1,3 @@
 import axios from 'axios';
 
-axios.defaults.baseURL = 'api/';
+axios.defaults.baseURL = 'https://api.coindesk.com/v1/';

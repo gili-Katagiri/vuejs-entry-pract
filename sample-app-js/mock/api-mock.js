@@ -14,7 +14,7 @@ const proxy = {
   'PATCH /api/profile': (req, res) => {
     if (req.body.userName === 'fune') {
       return res.status(422).json({
-        title: 'このユーザ名は既に使われています',
+        title: 'このユーザー名は既に使われています。',
       });
     }
     return res.status(200).json();
